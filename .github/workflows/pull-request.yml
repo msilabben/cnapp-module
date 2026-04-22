@@ -1,0 +1,11 @@
+name: pull-request.yml
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4  # Clones your code to the runner
+          
