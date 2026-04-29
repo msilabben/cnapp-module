@@ -7,7 +7,8 @@ on:
       - "frontend@*"
 
 permissions:
-  contents: write
+  contents: read
+  packages: write
 
 jobs:
   sbom:
@@ -58,7 +59,6 @@ jobs:
       image-name: backend
       context: backend
       dockerfile: Dockerfile
-      push: true
 
   frontend:
     if: ${{ startsWith(github.ref, 'refs/tags/frontend@v') }}
@@ -67,4 +67,3 @@ jobs:
       image-name: frontend
       context: frontend
       dockerfile: Dockerfile
-      push: true
