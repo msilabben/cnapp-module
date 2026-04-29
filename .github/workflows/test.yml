@@ -16,6 +16,10 @@ jobs:
       - name: Print Azure client ID from GitHub secret
         run: |
           echo "Azure Client ID from GitHub secret: ${{ secrets.THEATESTER_CLIENT_ID }}"
+      
+      - name: Check OIDC env
+        run: |
+        test -n "$ACTIONS_ID_TOKEN_REQUEST_URL" && echo "OIDC available" || echo "OIDC missing"
 
       - name: Login to Azure with OIDC
         uses: azure/login@v2
