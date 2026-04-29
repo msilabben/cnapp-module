@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.4](https://github.com/msilabben/cnapp-module/compare/backend@v0.1.3...backend@v0.1.4) (2026-04-29)
+
+
+### Bug Fixes
+
+* **backend:** rename version endpoint ([e03c840](https://github.com/msilabben/cnapp-module/commit/e03c8403d9566825d780ddf358c3ca28062d1391))
+
 ## [0.1.3](https://github.com/msilabben/cnapp-module/compare/backend@v0.1.2...backend@v0.1.3) (2026-04-29)
 
 
