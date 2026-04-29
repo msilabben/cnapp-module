@@ -9,6 +9,15 @@ permissions:
   security-events: write
 
 jobs:
+  pre-commit:
+    runs-on: ubuntu-22.04
+    name: Run pre-commit
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v3
+    - uses: pre-commit/action@v3.0.1
+
+
   semgrep:
     runs-on: ubuntu-22.04
     container:
