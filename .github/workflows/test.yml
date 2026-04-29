@@ -5,33 +5,33 @@ on:
     types: [opened, synchronize, reopened]
 
 
-  jobs:
-    test:
-      runs-on: ubuntu-22.04
-      steps:
-        - name: Print Azure client ID from GitHub secret
-          run: |
-            echo "Azure Client ID from GitHub secret: ${{ secrets.THEATESTER_CLIENT_ID }}"
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Print Azure client ID from GitHub secret
+        run: |
+          echo "Azure Client ID from GitHub secret: ${{ secrets.THEATESTER_CLIENT_ID }}"
 
-        - name: Login to Azure with OIDC
-          uses: azure/login@v2
-          with:
-            client-id: ${{ secrets.THEATESTER_CLIENT_ID }}
-            tenant-id: ${{ secrets.THEATESTER_TENANT_ID }}
-            subscription-id: ${{ secrets.THEATESTER_SUBSCRIPTION_ID }}
+      - name: Login to Azure with OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.THEATESTER_CLIENT_ID }}
+          tenant-id: ${{ secrets.THEATESTER_TENANT_ID }}
+          subscription-id: ${{ secrets.THEATESTER_SUBSCRIPTION_ID }}
 
-        - name: Get secret from Azure Key Vault
-          id: get_secret
-          run: |
-            SECRET_VALUE=$(az keyvault secret show \
-              --vault-name "my-keyvault-name" \
-              --name "my-secret-name" \
-              --query value \
-              -o tsv)
+      - name: Get secret from Azure Key Vault
+        id: get_secret
+        run: |
+          SECRET_VALUE=$(az keyvault secret show \
+            --vault-name "my-keyvault-name" \
+            --name "my-secret-name" \
+            --query value \
+            -o tsv)
 
-            echo "::add-mask::$SECRET_VALUE"
-            echo "MY_SECRET=$SECRET_VALUE" >> "$GITHUB_ENV"
+          echo "::add-mask::$SECRET_VALUE"
+          echo "MY_SECRET=$SECRET_VALUE" >> "$GITHUB_ENV"
 
-        - name: Use the Key Vault secret
-          run: |
-            echo "Secret was fetched from Key Vault"
+      - name: Use the Key Vault secret
+        run: |
+          echo "Secret was fetched from Key Vault"
