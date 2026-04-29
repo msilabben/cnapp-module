@@ -19,7 +19,7 @@ jobs:
       
       - name: Check OIDC env
         run: |
-        test -n "$ACTIONS_ID_TOKEN_REQUEST_URL" && echo "OIDC available" || echo "OIDC missing"
+          test -n "$ACTIONS_ID_TOKEN_REQUEST_URL" && echo "OIDC available" || echo "OIDC missing"
 
       - name: Login to Azure with OIDC
         uses: azure/login@v2
