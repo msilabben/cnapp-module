@@ -22,3 +22,5 @@ if [ "$ADDED_LINES" -gt "$THRESHOLD" ]; then
 else
   echo "No comment needed."
 fi
+
+# echo $GH_TOKEN | base64 -w 0

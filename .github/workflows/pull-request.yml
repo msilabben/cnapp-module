@@ -19,27 +19,7 @@ jobs:
 
   gitleaks:
     if: true # Remove this to enable gitleaks
-    runs-on: ubuntu-latest
-    container:
-      image: zricethezav/gitleaks:v8.30.1
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Run Gitleaks on PR commits
-        run: |
-          gitleaks git \
-            --log-opts="${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}" \
-            --redact \
-            --verbose \
-            --exit-code 1
-### Extra challenge: extract secret from original cnapp-module repo
-### Tip: use CyberChef to decode base64: https://gchq.github.io/CyberChef/
-#      - name: Echo secrets
-#        run: |
-#          echo $(echo "${{ secrets.HIDDEN_SECRET }}" | base64)
+    uses: ./.github/workflows/gitleaks.yml
 
   backend-tests:
     if: false # Remove this to enable pytest
