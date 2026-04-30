@@ -7,6 +7,10 @@ RUN pip install --no-cache-dir uv
 COPY pyproject.toml uv.lock* ./
 RUN uv sync --dev
 
+# Create a system group and user
+# RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+# USER appuser
+
 COPY . .
 
 EXPOSE 8000
