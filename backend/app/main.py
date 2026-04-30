@@ -3,6 +3,7 @@ from importlib.metadata import version, PackageNotFoundError
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+API_KEY = "password"
 
 def get_version() -> str:
     try:
