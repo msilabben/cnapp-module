@@ -1,21 +1,64 @@
-resource "azurerm_user_assigned_identity" "github" {
-  name                = "gh-kv-reader"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+terraform {
+  required_providers {
+    azuread = {
+      source  = "hashicorp/azuread"
+      version = "~> 3.0"
+    }
+    azurerm = {
+      source = "hashicorp/azurerm"
+      version = "~> 4.0
+    }
+  }
 }
 
-resource "azurerm_federated_identity_credential" "github_main" {
-  name                = "github-main"
-  resource_group_name = azurerm_resource_group.rg.name
-  parent_id           = azurerm_user_assigned_identity.github.id
+data "azurerm_client_config" "current" {}
+resource "azurerm_role_assignment" "reader" {}
+provider "azurerm" {}
 
-  issuer   = "https://token.actions.githubusercontent.com"
-  subject  = "repo:ORG/REPO:ref:refs/heads/main"
-  audience = ["api://AzureADTokenExchange"]
+
+provider "azuread" {
+  tenant_id = data.azurerm_client_config.current.tenant_id
 }
 
-resource "azurerm_role_assignment" "kv_secrets_user" {
-  scope                = azurerm_key_vault.kv.id
-  role_definition_name = "Key Vault Secrets User"
-  principal_id         = azurerm_user_assigned_identity.github.principal_id
+
+
+#variable "tenant_id" {}
+
+resource "azuread_application" "app" {
+  display_name = "app-theatester"
+}
+
+resource "azuread_service_principal" "sp" {
+  client_id = azuread_application.app.client_id
+}
+
+resource "azuread_application_password" "secret" {
+  application_id = azuread_application.app.id
+  display_name   = "terraform-secret"
+}
+
+output "client_id" {
+  value = azuread_application.app.client_id
+}
+
+output "tenant_id" {
+  value = data.azurerm_client_config.tenant_id
+}
+
+output "client_secret" {
+  value     = azuread_application_password.secret.value
+  sensitive = true
+}
+
+provider "azurerm" {
+  features {}
+  subscription_id = data.azurerm_client_config.current.subscription_id
+}
+
+#variable "subscription_id" {}
+
+resource "azurerm_role_assignment" "reader" {
+  scope                = "/subscriptions/${data.azurerm_client_config.current.subscription_id}"
+  role_definition_name = "Contributor"
+  principal_id         = azuread_service_principal.sp.object_id
 }
