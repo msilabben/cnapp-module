@@ -3,14 +3,22 @@
   "dockerComposeFile": ["../docker-compose.yml"],
   "service": "workspace",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "forwardPorts": [3000, 8000],
+  "portsAttributes": {
+    "3000": {
+      "label": "frontend",
+      "onAutoForward": "notify"
+    },
+    "8000": {
+      "label": "backend",
+      "onAutoForward": "notify"
+    }
+  },
   "customizations": {
     "vscode": {
       "extensions": [
-        "Semgrep.semgrep",
+        "Semgrep.semgrep"
       ]
     }
-  },
-  "build": {
-    "dockerfile": "Dockerfile"
   }
 }
