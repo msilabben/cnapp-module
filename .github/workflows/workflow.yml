@@ -1,0 +1,20 @@
+name: workflow.yml
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  job:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Comment on PR
+        run: ./bin/pr_comment.sh ${{ github.event.pull_request.number }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            
