@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.5](https://github.com/msilabben/cnapp-module/compare/backend@v0.1.4...backend@v0.1.5) (2026-05-03)
+
+
+### Bug Fixes
+
+* add uv sync ([a153cd0](https://github.com/msilabben/cnapp-module/commit/a153cd04955864d6a60d0c60771a1b53c11554f1))
+* pin pre-commit to hash ([7e08baf](https://github.com/msilabben/cnapp-module/commit/7e08baf934f604fd3878791ad3aee58c3360a63f))
+* trigger release please ([cc726c0](https://github.com/msilabben/cnapp-module/commit/cc726c05f3d70dee031d698bb8b433870cd9e3d0))
+
 ## [0.1.4](https://github.com/msilabben/cnapp-module/compare/backend@v0.1.3...backend@v0.1.4) (2026-04-29)
 
 
