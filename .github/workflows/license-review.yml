@@ -1,0 +1,114 @@
+name: license review
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * 1"
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  ort:
+    name: Run ORT license review
+    runs-on: ubuntu-22.04
+
+    env:
+      ORT_IMAGE: ghcr.io/oss-review-toolkit/ort:latest
+      ORT_RESULTS_DIR: ort-results
+      ORT_ISSUE_TITLE: "Scheduled license review findings"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
+
+      - name: Run ORT analyzer
+        run: |
+          mkdir -p "${ORT_RESULTS_DIR}/analyzer"
+
+          docker run --rm \
+            --volume "$PWD:/project" \
+            --workdir /project \
+            "${ORT_IMAGE}" \
+            analyze \
+            --input-dir /project \
+            --output-dir /project/${ORT_RESULTS_DIR}/analyzer \
+            --output-formats JSON,YAML
+
+      - name: Run ORT scanner
+        run: |
+          mkdir -p "${ORT_RESULTS_DIR}/scanner"
+
+          docker run --rm \
+            --volume "$PWD:/project" \
+            --workdir /project \
+            "${ORT_IMAGE}" \
+            scan \
+            --input /project/${ORT_RESULTS_DIR}/analyzer/analyzer-result.yml \
+            --output /project/${ORT_RESULTS_DIR}/scanner \
+            --output-formats JSON
+
+      - name: Run ORT evaluator
+        id: evaluator
+        continue-on-error: true
+        run: |
+          mkdir -p "${ORT_RESULTS_DIR}/evaluator"
+
+          docker run --rm \
+            --volume "$PWD:/project" \
+            --workdir /project \
+            "${ORT_IMAGE}" \
+            evaluate \
+            --input /project/${ORT_RESULTS_DIR}/scanner/scan-result.yml \
+            --output /project/${ORT_RESULTS_DIR}/evaluator \
+            --output-formats JSON
+
+      - name: Run ORT reporter
+        run: |
+          mkdir -p "${ORT_RESULTS_DIR}/reporter"
+
+          docker run --rm \
+            --volume "$PWD:/project" \
+            --workdir /project \
+            "${ORT_IMAGE}" \
+            report \
+            --input /project/${ORT_RESULTS_DIR}/evaluator/evaluation-result.yml \
+            --output /project/${ORT_RESULTS_DIR}/reporter \
+            --report-formats WebApp,StaticHtml,PlainTextTemplate
+
+      - name: Upload ORT reports
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: ort-license-review
+          path: ort-results/
+
+      - name: Create or update license review issue
+        if: steps.evaluator.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_TITLE: ${{ env.ORT_ISSUE_TITLE }}
+          ISSUE_LABELS: license-compliance,needs-review
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          sed "s|{{RUN_URL}}|${RUN_URL}|g" \
+            .github/issue-templates/license-review.md > issue-body.md
+
+          issue_number="$(
+            gh issue list \
+              --state open \
+              --label license-compliance \
+              --search "${ISSUE_TITLE} in:title" \
+              --json number,title \
+              --jq ".[] | select(.title == \"${ISSUE_TITLE}\") | .number" \
+              | head -n 1
+          )"
+
+          if [ -n "${issue_number}" ]; then
+            gh issue edit "${issue_number}" --body-file issue-body.md
+          else
+            gh issue create \
+              --title "${ISSUE_TITLE}" \
+              --body-file issue-body.md \
+              --label "${ISSUE_LABELS}"
+          fi
