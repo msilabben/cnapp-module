@@ -38,7 +38,7 @@ jobs:
       - name: Verify Image Signature
         run: |
           cosign verify \
-            --certificate-identity "https://github.com/msilabben/<your repository name>/.github/workflows/push-main.yml@refs/heads/main" \
+            --certificate-identity "https://github.com/msilabben/cnapp-module-2-application-theakvg/.github/workflows/push-main.yml@refs/heads/main" \
             --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
             ghcr.io/mislabben/trivy:0.71.1
 
