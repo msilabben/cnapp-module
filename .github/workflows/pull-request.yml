@@ -28,6 +28,18 @@ jobs:
       working-directory: backend
       python-version: "3.11"
 
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3.5.0
+
+      - name: Verify Image Signature
+        run: |
+          cosign verify \
+            --certificate-identity "https://github.com/msilabben/<your repository name>/.github/workflows/push-main.yml@refs/heads/main" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+            ghcr.io/mislabben/trivy:0.71.1
 
   semgrep:
     if: false # Remove this to enable SAST with semgrep
